@@ -11,26 +11,33 @@ let destLatLng = null;
 let bleDevice = null;
 let bleServer = null;
 
-// DOM elements
-const loginModal = document.getElementById('loginModal');
-const app = document.getElementById('app');
-const logEl = document.getElementById('log');
-const bleStatusEl = document.getElementById('bleStatus');
-const gpsStatusEl = document.getElementById('gpsStatus');
-const batteryLevelEl = document.getElementById('batteryLevel');
-const signalStrengthEl = document.getElementById('signalStrength');
-const youCoordsEl = document.getElementById('youCoords');
-const destCoordsEl = document.getElementById('destCoords');
-const distanceToDestEl = document.getElementById('distanceToDest');
-const etaToDestEl = document.getElementById('etaToDest');
-const userProfileEl = document.getElementById('userProfile');
-const guardianListEl = document.getElementById('guardianList');
-const navigationHistoryEl = document.getElementById('navigationHistory');
-const obstaclesHistoryEl = document.getElementById('obstaclesHistory');
-const alertsListEl = document.getElementById('alertsList');
+// DOM elements - Initialize after DOM is loaded
+let loginModal, app, logEl, bleStatusEl, gpsStatusEl, batteryLevelEl, signalStrengthEl;
+let youCoordsEl, destCoordsEl, distanceToDestEl, etaToDestEl, userProfileEl;
+let guardianListEl, navigationHistoryEl, obstaclesHistoryEl, alertsListEl;
+
+function initializeDOMElements() {
+  loginModal = document.getElementById('loginModal');
+  app = document.getElementById('app');
+  logEl = document.getElementById('log');
+  bleStatusEl = document.getElementById('bleStatus');
+  gpsStatusEl = document.getElementById('gpsStatus');
+  batteryLevelEl = document.getElementById('batteryLevel');
+  signalStrengthEl = document.getElementById('signalStrength');
+  youCoordsEl = document.getElementById('youCoords');
+  destCoordsEl = document.getElementById('destCoords');
+  distanceToDestEl = document.getElementById('distanceToDest');
+  etaToDestEl = document.getElementById('etaToDest');
+  userProfileEl = document.getElementById('userProfile');
+  guardianListEl = document.getElementById('guardianList');
+  navigationHistoryEl = document.getElementById('navigationHistory');
+  obstaclesHistoryEl = document.getElementById('obstaclesHistory');
+  alertsListEl = document.getElementById('alertsList');
+}
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
+  initializeDOMElements();
   initializeApp();
 });
 
@@ -61,8 +68,14 @@ function showLogin() {
 }
 
 function showApp() {
-  loginModal.classList.add('hidden');
-  app.classList.remove('hidden');
+  console.log('Showing main app...', loginModal, app);
+  if (loginModal && app) {
+    loginModal.classList.add('hidden');
+    app.classList.remove('hidden');
+    console.log('Main app should now be visible');
+  } else {
+    console.error('DOM elements not found:', { loginModal, app });
+  }
 }
 
 // Authentication
