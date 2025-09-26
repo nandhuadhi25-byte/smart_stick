@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Smart Safety Stick - Dashboard</title>
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    />
+    <!-- Leaflet Routing Machine CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"
+    />
+
+    <link rel="stylesheet" href="./public/styles.css" />
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome to Smart Safety Stick</h2>
+                <button id="closeLoginModal" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-tabs">
+                    <button id="loginTab" class="tab-btn active">Login</button>
+                    <button id="registerTab" class="tab-btn">Register</button>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input id="loginEmail" type="email" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input id="loginPassword" type="password" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="auth-form hidden">
+                    <div class="form-group">
+                        <label for="registerName">Full Name</label>
+                        <input id="registerName" type="text" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input id="registerEmail" type="email" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPhone">Phone</label>
+                        <input id="registerPhone" type="tel" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input id="registerPassword" type="password" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="hidden">
+        <!-- Demo Mode Banner -->
+        <div id="demoBanner" class="demo-banner" style="display: none;">
+            <div class="demo-content">
+                🚀 <strong>Demo Mode</strong> - Full functionality without backend server. 
+                <span class="demo-note">Real-time features simulated for demonstration.</span>
+            </div>
+        </div>
+        
+        <header class="topbar">
+            <div class="brand">
+                <span class="logo">🦯</span>
+                <span class="title">Smart Safety Stick</span>
+            </div>
+            <nav class="actions">
+                <button id="bleConnectBtn" class="btn">Connect Stick</button>
+                <button id="bleDisconnectBtn" class="btn btn-secondary">Disconnect</button>
+                <button id="startRouteBtn" class="btn">Start Route</button>
+                <button id="sosSmsBtn" class="btn btn-danger">SOS SMS</button>
+                <button id="sosWaBtn" class="btn btn-danger">SOS WhatsApp</button>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </nav>
+        </header>
+
+        <main class="layout">
+            <section class="left">
+                <div class="panel">
+                    <label for="searchInput">Destination</label>
+                    <div class="search-row">
+                        <input id="searchInput" type="text" placeholder="Search place or address" />
+                        <button id="searchBtn" class="btn btn-small">Search</button>
+                    </div>
+                    <div class="hint">Tip: Tap anywhere on the map to set destination.</div>
+                </div>
+
+                <div id="map" class="map"></div>
+            </section>
+
+            <aside class="right">
+                <div class="panel">
+                    <h3>User Profile</h3>
+                    <div id="userProfile" class="user-profile">
+                        <div class="loading">Loading profile...</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Guardian Contacts</h3>
+                    <div id="guardianList" class="guardian-list">
+                        <div class="loading">Loading guardians...</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Device Status</h3>
+                    <ul class="kv">
+                        <li><span>BLE</span><strong id="bleStatus">disconnected</strong></li>
+                        <li><span>GPS</span><strong id="gpsStatus">locating…</strong></li>
+                        <li><span>Battery</span><strong id="batteryLevel">—</strong></li>
+                        <li><span>Signal</span><strong id="signalStrength">—</strong></li>
+                    </ul>
+                </div>
+
+                <div class="panel">
+                    <h3>Location</h3>
+                    <ul class="kv">
+                        <li><span>You</span><strong id="youCoords">—</strong></li>
+                        <li><span>Dest</span><strong id="destCoords">—</strong></li>
+                        <li><span>Distance</span><strong id="distanceToDest">—</strong></li>
+                        <li><span>ETA</span><strong id="etaToDest">—</strong></li>
+                    </ul>
+                </div>
+
+                <div class="panel">
+                    <h3>Navigation History</h3>
+                    <div id="navigationHistory" class="history-list">
+                        <div class="loading">No navigation history</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Obstacles History</h3>
+                    <div id="obstaclesHistory" class="obstacles-list">
+                        <div class="loading">No obstacles detected</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Emergency Alerts</h3>
+                    <div id="alertsList" class="alerts-list">
+                        <div class="loading">No active alerts</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>System Logs</h3>
+                    <pre id="log" class="log"></pre>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Socket.io (CDN for static hosting like GitHub Pages) -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-Iw7/ol6oXUo3oh6vBdnFHsGxFJYdGqubg5gKlGdq1RTD6R0cJcK0KThhFIlJt7c+" crossorigin="anonymous"></script>
+    <!-- Leaflet JS -->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+    ></script>
+    <!-- Leaflet Routing Machine JS -->
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
+
+    <script>
+        // For GitHub Pages deployment, you'll need to deploy your backend separately
+        // You can use services like Heroku, Railway, Render, or Vercel for the backend
+        // Leave empty string for demo mode without backend
+        window.API_BASE="";
+    </script>
+    <script src="./public/app.js"></script>
+</body>
+</html>

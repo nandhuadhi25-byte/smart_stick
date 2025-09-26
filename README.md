@@ -1,6 +1,26 @@
 # Smart Safety Stick - Full Stack Application
 
-A comprehensive IoT safety solution combining ESP32 hardware, mobile app, and web dashboard for emergency assistance and navigation.
+[![Deploy to GitHub Pages](https://github.com/nandhuadhi25-byte/smart_stick/actions/workflows/deploy.yml/badge.svg)](https://github.com/nandhuadhi25-byte/smart_stick/actions/workflows/deploy.yml)
+
+🔗 **Live Demo**: [https://nandhuadhi25-byte.github.io/smart_stick/](https://nandhuadhi25-byte.github.io/smart_stick/)
+
+A comprehensive IoT safety solution combining ESP32 hardware, mobile app, and web dashboard for emergency assistance and navigation. The frontend is deployed on GitHub Pages with full demo functionality.
+
+## 🚀 Live Demo
+
+The application is deployed and available at: **[https://nandhuadhi25-byte.github.io/smart_stick/](https://nandhuadhi25-byte.github.io/smart_stick/)**
+
+### Demo Features Available:
+- ✅ **Full frontend functionality** - Complete UI/UX experience
+- ✅ **Interactive maps** - Real-time location tracking and routing  
+- ✅ **Bluetooth connectivity** - Connect ESP32 devices via Web Bluetooth
+- ✅ **Emergency alerts** - SMS and WhatsApp emergency notifications
+- ✅ **Navigation system** - Turn-by-turn directions with OpenStreetMap
+- ✅ **Device simulation** - Mock device data for demonstration
+- ✅ **User authentication** - Demo login/register system
+
+### Demo Mode:
+When running without a backend server, the app automatically enters **Demo Mode** with simulated data and full frontend functionality. All features work as designed, perfect for testing and demonstration purposes.
 
 ## 🚀 Features
 
@@ -299,6 +319,80 @@ smart-safety-stick/
 3. **ESP32:** Modify `esp32/smart_safety_stick.ino` for hardware changes
 
 ## 🚀 Deployment
+
+## 🚀 Deployment
+
+### GitHub Pages (Frontend Only)
+
+The frontend is automatically deployed to GitHub Pages on every push to the `gh-pages` branch.
+
+**Live URL**: [https://nandhuadhi25-byte.github.io/smart_stick/](https://nandhuadhi25-byte.github.io/smart_stick/)
+
+#### Setup GitHub Pages:
+1. Go to your repository settings
+2. Navigate to **Pages** section
+3. Set **Source** to "Deploy from a branch"
+4. Select **Branch**: `gh-pages` and **Folder**: `/ (root)`
+5. Save settings
+
+#### Manual Deployment:
+```bash
+# Ensure you're on gh-pages branch
+git checkout gh-pages
+
+# Add and commit changes
+git add .
+git commit -m "Update frontend"
+
+# Push to GitHub
+git push origin gh-pages
+```
+
+### Backend Deployment Options
+
+For full functionality with real-time features, deploy the backend separately:
+
+#### Option 1: Heroku
+```bash
+# Install Heroku CLI and login
+heroku create your-smart-stick-app
+heroku config:set MONGODB_URI=your-mongodb-uri
+heroku config:set JWT_SECRET=your-jwt-secret
+# ... other environment variables
+git push heroku main
+```
+
+#### Option 2: Railway
+```bash
+# Install Railway CLI
+railway login
+railway init
+railway add
+# Configure environment variables in Railway dashboard
+railway up
+```
+
+#### Option 3: Render
+1. Connect your GitHub repository to Render
+2. Create a new Web Service
+3. Set build command: `npm install`
+4. Set start command: `npm start`
+5. Configure environment variables
+
+#### Option 4: Vercel
+```bash
+# Install Vercel CLI
+npm i -g vercel
+vercel
+# Follow the prompts and configure environment variables
+```
+
+### Full Stack Deployment
+
+To connect frontend with backend:
+1. Deploy backend to your preferred platform
+2. Update `window.API_BASE` in `index.html` with your backend URL
+3. Commit and push changes
 
 ### Heroku Deployment
 

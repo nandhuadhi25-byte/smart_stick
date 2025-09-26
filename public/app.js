@@ -1,7 +1,9 @@
 // Global state
 let socket = null;
 // Set this to your deployed backend when ready
+// For demo mode without backend, set to empty string
 const API_BASE = window.API_BASE || '';
+const DEMO_MODE = !API_BASE; // Enable demo mode when no backend is available
 let currentUser = null;
 let map, youMarker, destMarker, routeControl;
 let youLatLng = null;
@@ -35,6 +37,27 @@ document.addEventListener('DOMContentLoaded', () => {
 async function initializeApp() {
   // Check if user is logged in
   const token = localStorage.getItem('token');
+  
+  if (DEMO_MODE) {
+    // Demo mode - skip authentication
+    console.log('Running in demo mode');
+    currentUser = {
+      _id: 'demo-user',
+      name: 'Demo User',
+      email: 'demo@smartstick.com',
+      phone: '+1-234-567-8900',
+      emergencyContacts: [
+        { name: 'Emergency Contact 1', phone: '+1-234-567-8901', relationship: 'Family' },
+        { name: 'Emergency Contact 2', phone: '+1-234-567-8902', relationship: 'Friend' }
+      ]
+    };
+    showApp();
+    initializeMap();
+    loadUserData();
+    log('Demo mode activated - full functionality available without backend');
+    return;
+  }
+  
   if (token) {
     try {
       const response = await fetch((API_BASE || '') + '/api/auth/profile', {
@@ -72,6 +95,14 @@ function showLogin() {
 function showApp() {
   loginModal.classList.add('hidden');
   app.classList.remove('hidden');
+  
+  // Show demo banner if in demo mode
+  if (DEMO_MODE) {
+    const demoBanner = document.getElementById('demoBanner');
+    if (demoBanner) {
+      demoBanner.style.display = 'block';
+    }
+  }
 }
 
 // Authentication
@@ -95,6 +126,25 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
+  
+  if (DEMO_MODE) {
+    // Demo mode - simulate login
+    localStorage.setItem('token', 'demo-token');
+    currentUser = {
+      _id: 'demo-user',
+      name: 'Demo User',
+      email: email,
+      phone: '+1-234-567-8900',
+      emergencyContacts: [
+        { name: 'Emergency Contact 1', phone: '+1-234-567-8901', relationship: 'Family' },
+        { name: 'Emergency Contact 2', phone: '+1-234-567-8902', relationship: 'Friend' }
+      ]
+    };
+    showApp();
+    initializeMap();
+    loadUserData();
+    return;
+  }
   
   try {
     const response = await fetch((API_BASE || '') + '/api/auth/login', {
@@ -126,6 +176,25 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
   const email = document.getElementById('registerEmail').value;
   const phone = document.getElementById('registerPhone').value;
   const password = document.getElementById('registerPassword').value;
+  
+  if (DEMO_MODE) {
+    // Demo mode - simulate registration
+    localStorage.setItem('token', 'demo-token');
+    currentUser = {
+      _id: 'demo-user',
+      name: name,
+      email: email,
+      phone: phone,
+      emergencyContacts: [
+        { name: 'Emergency Contact 1', phone: '+1-234-567-8901', relationship: 'Family' },
+        { name: 'Emergency Contact 2', phone: '+1-234-567-8902', relationship: 'Friend' }
+      ]
+    };
+    showApp();
+    initializeMap();
+    loadUserData();
+    return;
+  }
   
   try {
     const response = await fetch((API_BASE || '') + '/api/auth/register', {
@@ -160,6 +229,11 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 // Socket.io initialization
 function initializeSocket() {
+  if (DEMO_MODE) {
+    log('Demo mode: Socket connection disabled');
+    return;
+  }
+  
   socket = io(API_BASE || undefined);
   
   socket.on('connect', () => {
@@ -354,28 +428,38 @@ async function sendSosSms() {
   const body = encodeURIComponent(`EMERGENCY: I need help. My location: ${link}`);
   
   // Create emergency alert
-  try {
-    const response = await fetch((API_BASE || '') + '/api/emergency/alert', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify({
-        deviceId: 'web-dashboard',
-        latitude: youLatLng?.lat || map.getCenter().lat,
-        longitude: youLatLng?.lng || map.getCenter().lng,
-        alertType: 'manual',
-        message: 'Emergency assistance needed',
-        priority: 'critical'
-      })
-    });
-    
-    if (response.ok) {
-      log('Emergency alert sent to server');
+  if (!DEMO_MODE) {
+    try {
+      const response = await fetch((API_BASE || '') + '/api/emergency/alert', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          deviceId: 'web-dashboard',
+          latitude: youLatLng?.lat || map.getCenter().lat,
+          longitude: youLatLng?.lng || map.getCenter().lng,
+          alertType: 'manual',
+          message: 'Emergency assistance needed',
+          priority: 'critical'
+        })
+      });
+      
+      if (response.ok) {
+        log('Emergency alert sent to server');
+      }
+    } catch (error) {
+      log('Failed to send emergency alert', error);
     }
-  } catch (error) {
-    log('Failed to send emergency alert', error);
+  } else {
+    log('Demo: Emergency alert would be sent to server');
+    // Simulate emergency alert in demo mode
+    showEmergencyAlert({
+      alertType: 'manual',
+      location: { lat: youLatLng?.lat || map.getCenter().lat, lng: youLatLng?.lng || map.getCenter().lng },
+      message: 'Emergency assistance needed'
+    });
   }
   
   // Try SMS deep link
@@ -387,28 +471,38 @@ async function sendSosWhatsApp() {
   const text = encodeURIComponent(`EMERGENCY: I need help. My location: ${link}`);
   
   // Create emergency alert
-  try {
-    const response = await fetch((API_BASE || '') + '/api/emergency/alert', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify({
-        deviceId: 'web-dashboard',
-        latitude: youLatLng?.lat || map.getCenter().lat,
-        longitude: youLatLng?.lng || map.getCenter().lng,
-        alertType: 'manual',
-        message: 'Emergency assistance needed',
-        priority: 'critical'
-      })
-    });
-    
-    if (response.ok) {
-      log('Emergency alert sent to server');
+  if (!DEMO_MODE) {
+    try {
+      const response = await fetch((API_BASE || '') + '/api/emergency/alert', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          deviceId: 'web-dashboard',
+          latitude: youLatLng?.lat || map.getCenter().lat,
+          longitude: youLatLng?.lng || map.getCenter().lng,
+          alertType: 'manual',
+          message: 'Emergency assistance needed',
+          priority: 'critical'
+        })
+      });
+      
+      if (response.ok) {
+        log('Emergency alert sent to server');
+      }
+    } catch (error) {
+      log('Failed to send emergency alert', error);
     }
-  } catch (error) {
-    log('Failed to send emergency alert', error);
+  } else {
+    log('Demo: Emergency alert would be sent to server');
+    // Simulate emergency alert in demo mode
+    showEmergencyAlert({
+      alertType: 'manual',
+      location: { lat: youLatLng?.lat || map.getCenter().lat, lng: youLatLng?.lng || map.getCenter().lng },
+      message: 'Emergency assistance needed'
+    });
   }
   
   // Try WhatsApp deep link
@@ -523,25 +617,14 @@ async function loadAlerts() {
 
 function renderDevices(devices) {
   if (devices.length === 0) {
-    devicesListEl.innerHTML = '<div class="loading">No devices registered</div>';
+    log('No devices registered');
     // Set mock battery and signal data for demo
     setBatteryLevel(85);
     setSignalStrength(75);
     return;
   }
   
-  devicesListEl.innerHTML = devices.map(device => `
-    <div class="device-item">
-      <div class="device-info">
-        <h4>${device.name}</h4>
-        <p>${device.deviceType} • ${device.firmwareVersion || 'Unknown'}</p>
-      </div>
-      <div class="device-status">
-        <div class="status-indicator ${device.isConnected ? 'connected' : ''}"></div>
-        <div class="battery-level">${device.batteryLevel}%</div>
-      </div>
-    </div>
-  `).join('');
+  log(`${devices.length} devices found`);
   
   // Update battery and signal displays with first device data
   if (devices.length > 0) {
