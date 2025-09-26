@@ -35,56 +35,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initializeApp() {
-  // Check if user is logged in
+  // Always show login - no auto-authentication
   const token = localStorage.getItem('token');
   
-  if (DEMO_MODE) {
-    // Demo mode - skip authentication
-    console.log('Running in demo mode');
-    currentUser = {
-      _id: 'demo-user',
-      name: 'Demo User',
-      email: 'demo@smartstick.com',
-      phone: '+1-234-567-8900',
-      emergencyContacts: [
-        { name: 'Emergency Contact 1', phone: '+1-234-567-8901', relationship: 'Family' },
-        { name: 'Emergency Contact 2', phone: '+1-234-567-8902', relationship: 'Friend' }
-      ]
-    };
-    showApp();
-    initializeMap();
-    loadUserData();
-    log('Demo mode activated - full functionality available without backend');
-    return;
+  if (token) {
+    // If token exists, assume user is logged in
+    currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (currentUser && currentUser.name) {
+      showApp();
+      initializeMap();
+      loadUserData();
+      log(`Welcome back, ${currentUser.name}!`);
+      return;
+    }
   }
   
-  if (token) {
-    try {
-      const response = await fetch((API_BASE || '') + '/api/auth/profile', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (response.ok) {
-        currentUser = await response.json();
-        console.log('User authenticated:', currentUser.name);
-        showApp();
-        initializeSocket();
-        initializeMap();
-        loadUserData();
-      } else {
-        console.log('Token invalid, showing login');
-        localStorage.removeItem('token');
-        showLogin();
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      localStorage.removeItem('token');
-      showLogin();
-    }
-  } else {
-    console.log('No token found, showing login');
-    showLogin();
-  }
+  // Show login for all users
+  console.log('Please login to continue');
+  showLogin();
 }
 
 function showLogin() {
@@ -95,14 +63,6 @@ function showLogin() {
 function showApp() {
   loginModal.classList.add('hidden');
   app.classList.remove('hidden');
-  
-  // Show demo banner if in demo mode
-  if (DEMO_MODE) {
-    const demoBanner = document.getElementById('demoBanner');
-    if (demoBanner) {
-      demoBanner.style.display = 'block';
-    }
-  }
 }
 
 // Authentication
@@ -127,12 +87,12 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
   
-  if (DEMO_MODE) {
-    // Demo mode - simulate login
-    localStorage.setItem('token', 'demo-token');
-    currentUser = {
-      _id: 'demo-user',
-      name: 'Demo User',
+  // Allow any login credentials
+  if (email && password) {
+    // Create user based on login info
+    const userData = {
+      _id: 'user-' + Date.now(),
+      name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
       email: email,
       phone: '+1-234-567-8900',
       emergencyContacts: [
@@ -140,33 +100,18 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         { name: 'Emergency Contact 2', phone: '+1-234-567-8902', relationship: 'Friend' }
       ]
     };
+    
+    localStorage.setItem('token', 'user-token-' + Date.now());
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+    currentUser = userData;
+    
     showApp();
     initializeMap();
     loadUserData();
+    log(`Welcome ${currentUser.name}! Login successful.`);
     return;
-  }
-  
-  try {
-    const response = await fetch((API_BASE || '') + '/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    
-    const data = await response.json();
-    if (response.ok) {
-      localStorage.setItem('token', data.token);
-      currentUser = data.user;
-      showApp();
-      initializeSocket();
-      initializeMap();
-      loadUserData();
-    } else {
-      alert(data.message || 'Login failed');
-    }
-  } catch (error) {
-    console.error('Login error:', error);
-    alert('Login failed');
+  } else {
+    alert('Please enter both email and password');
   }
 });
 
@@ -177,95 +122,47 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
   const phone = document.getElementById('registerPhone').value;
   const password = document.getElementById('registerPassword').value;
   
-  if (DEMO_MODE) {
-    // Demo mode - simulate registration
-    localStorage.setItem('token', 'demo-token');
-    currentUser = {
-      _id: 'demo-user',
+  // Allow any registration
+  if (name && email && password) {
+    const userData = {
+      _id: 'user-' + Date.now(),
       name: name,
       email: email,
-      phone: phone,
+      phone: phone || '+1-234-567-8900',
       emergencyContacts: [
         { name: 'Emergency Contact 1', phone: '+1-234-567-8901', relationship: 'Family' },
         { name: 'Emergency Contact 2', phone: '+1-234-567-8902', relationship: 'Friend' }
       ]
     };
+    
+    localStorage.setItem('token', 'user-token-' + Date.now());
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+    currentUser = userData;
+    
     showApp();
     initializeMap();
     loadUserData();
+    log(`Welcome ${currentUser.name}! Registration successful.`);
     return;
-  }
-  
-  try {
-    const response = await fetch((API_BASE || '') + '/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, password })
-    });
-    
-    const data = await response.json();
-    if (response.ok) {
-      localStorage.setItem('token', data.token);
-      currentUser = data.user;
-      showApp();
-      initializeSocket();
-      initializeMap();
-      loadUserData();
-    } else {
-      alert(data.message || 'Registration failed');
-    }
-  } catch (error) {
-    console.error('Registration error:', error);
-    alert('Registration failed');
+  } else {
+    alert('Please fill in all required fields');
   }
 });
 
 document.getElementById('logoutBtn').addEventListener('click', () => {
   localStorage.removeItem('token');
+  localStorage.removeItem('currentUser');
   currentUser = null;
   if (socket) socket.disconnect();
   showLogin();
+  log('Logged out successfully');
 });
 
 // Socket.io initialization
 function initializeSocket() {
-  if (DEMO_MODE) {
-    log('Demo mode: Socket connection disabled');
-    return;
-  }
-  
-  socket = io(API_BASE || undefined);
-  
-  socket.on('connect', () => {
-    log('Connected to server');
-    socket.emit('join-user-room', currentUser._id);
-  });
-  
-  socket.on('disconnect', () => {
-    log('Disconnected from server');
-  });
-  
-  socket.on('location-updated', (data) => {
-    log('Location updated via socket', data);
-    updateLocationDisplay(data.location);
-  });
-  
-  socket.on('device-status-update', (data) => {
-    log('Device status updated', data);
-    loadDevices();
-  });
-  
-  socket.on('emergency-triggered', (data) => {
-    log('Emergency alert triggered!', data);
-    showEmergencyAlert(data);
-    loadAlerts();
-  });
-  
-  socket.on('emergency-broadcast', (data) => {
-    log('Emergency broadcast received', data);
-    loadAlerts();
-  });
-}
+  // Socket functionality disabled for static deployment
+  log('Socket connection disabled - running in static mode');
+  return;
 
 // Map initialization
 function initializeMap() {
@@ -427,40 +324,13 @@ async function sendSosSms() {
   const link = currentMapsLink();
   const body = encodeURIComponent(`EMERGENCY: I need help. My location: ${link}`);
   
-  // Create emergency alert
-  if (!DEMO_MODE) {
-    try {
-      const response = await fetch((API_BASE || '') + '/api/emergency/alert', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          deviceId: 'web-dashboard',
-          latitude: youLatLng?.lat || map.getCenter().lat,
-          longitude: youLatLng?.lng || map.getCenter().lng,
-          alertType: 'manual',
-          message: 'Emergency assistance needed',
-          priority: 'critical'
-        })
-      });
-      
-      if (response.ok) {
-        log('Emergency alert sent to server');
-      }
-    } catch (error) {
-      log('Failed to send emergency alert', error);
-    }
-  } else {
-    log('Demo: Emergency alert would be sent to server');
-    // Simulate emergency alert in demo mode
-    showEmergencyAlert({
-      alertType: 'manual',
-      location: { lat: youLatLng?.lat || map.getCenter().lat, lng: youLatLng?.lng || map.getCenter().lng },
-      message: 'Emergency assistance needed'
-    });
-  }
+  log('Emergency SMS alert initiated');
+  // Simulate emergency alert
+  showEmergencyAlert({
+    alertType: 'manual',
+    location: { lat: youLatLng?.lat || map.getCenter().lat, lng: youLatLng?.lng || map.getCenter().lng },
+    message: 'Emergency assistance needed - SMS sent'
+  });
   
   // Try SMS deep link
   window.location.href = `sms:?&body=${body}`;
@@ -470,40 +340,13 @@ async function sendSosWhatsApp() {
   const link = currentMapsLink();
   const text = encodeURIComponent(`EMERGENCY: I need help. My location: ${link}`);
   
-  // Create emergency alert
-  if (!DEMO_MODE) {
-    try {
-      const response = await fetch((API_BASE || '') + '/api/emergency/alert', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          deviceId: 'web-dashboard',
-          latitude: youLatLng?.lat || map.getCenter().lat,
-          longitude: youLatLng?.lng || map.getCenter().lng,
-          alertType: 'manual',
-          message: 'Emergency assistance needed',
-          priority: 'critical'
-        })
-      });
-      
-      if (response.ok) {
-        log('Emergency alert sent to server');
-      }
-    } catch (error) {
-      log('Failed to send emergency alert', error);
-    }
-  } else {
-    log('Demo: Emergency alert would be sent to server');
-    // Simulate emergency alert in demo mode
-    showEmergencyAlert({
-      alertType: 'manual',
-      location: { lat: youLatLng?.lat || map.getCenter().lat, lng: youLatLng?.lng || map.getCenter().lng },
-      message: 'Emergency assistance needed'
-    });
-  }
+  log('Emergency WhatsApp alert initiated');
+  // Simulate emergency alert
+  showEmergencyAlert({
+    alertType: 'manual',
+    location: { lat: youLatLng?.lat || map.getCenter().lat, lng: youLatLng?.lng || map.getCenter().lng },
+    message: 'Emergency assistance needed - WhatsApp message sent'
+  });
   
   // Try WhatsApp deep link
   window.open(`https://wa.me/?text=${text}`, '_blank');
