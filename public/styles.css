@@ -570,15 +570,13 @@ input[type="text"] {
   }
 }
 
-/* Make sure main app is always visible */
-#app {
-    display: block !important;
-    visibility: visible !important;
+/* Initial state - show login by default */
+#loginModal {
+    display: flex;
 }
 
-/* Hide login modal completely */
-#loginModal {
-    display: none !important;
+#app {
+    display: none;
 }
 
 /* Guardian item styling */

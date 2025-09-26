@@ -6,6 +6,9 @@
     <title>VISIONX - Smart Navigation Dashboard v2</title>
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    
+    <!-- Amazing Styles with cache busting -->
+    <link rel="stylesheet" href="public/amazing-styles.css?v=1.0">
 
     <!-- Leaflet CSS -->
     <link
@@ -23,8 +26,66 @@
     <link rel="stylesheet" href="public/styles.css" />
 </head>
 <body>
-    <!-- Main App - No Login Required -->
-    <div id="app">
+    <!-- Floating Particles -->
+    <div class="particles"></div>
+    
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome to VISIONX</h2>
+            </div>
+            <div class="modal-body">
+                <div class="auth-tabs">
+                    <button id="loginTab" class="tab active">Login</button>
+                    <button id="registerTab" class="tab">Register</button>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input id="loginEmail" type="email" placeholder="Enter your email" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input id="loginPassword" type="password" placeholder="Enter your password" required minlength="3" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <div class="login-hint">
+                        <small>You can use any email and password (3+ characters) to login</small>
+                    </div>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="auth-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="registerName">Full Name</label>
+                        <input id="registerName" type="text" placeholder="Enter your full name" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input id="registerEmail" type="email" placeholder="Enter your email" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPhone">Phone</label>
+                        <input id="registerPhone" type="tel" placeholder="Enter your phone number" />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input id="registerPassword" type="password" placeholder="Create a password" required minlength="3" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                    <div class="login-hint">
+                        <small>Create an account with any details</small>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App - Initially Hidden -->
+    <div id="app" style="display: none;">
         <header class="topbar">
             <div class="brand">
                 <span class="logo">👁️</span>
@@ -36,6 +97,7 @@
                 <button id="startRouteBtn" class="btn">Start Route</button>
                 <button id="sosSmsBtn" class="btn btn-danger">SOS SMS</button>
                 <button id="sosWaBtn" class="btn btn-danger">SOS WhatsApp</button>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
             </nav>
         </header>
 
@@ -57,14 +119,7 @@
                 <div class="panel">
                     <h3>User Profile</h3>
                     <div id="userProfile" class="user-profile">
-                        <div class="user-info">
-                            <div class="user-avatar">U</div>
-                            <div class="user-details">
-                                <h4>VISIONX User</h4>
-                                <p>user@visionx.com</p>
-                                <p>+1-234-567-8900</p>
-                            </div>
-                        </div>
+                        <div class="loading">Loading profile...</div>
                     </div>
                 </div>
 
@@ -148,6 +203,58 @@
         // Leave empty string for demo mode without backend
         window.API_BASE="";
     </script>
-    <script src="public/direct-app.js"></script>
+    <script src="public/login-app.js"></script>
+    
+    <!-- Floating Particles Script -->
+    <script>
+        // Create floating particles with mobile optimization
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            
+            // Reduce particles on mobile for better performance
+            const isMobile = window.innerWidth <= 768;
+            const particleCount = isMobile ? 20 : 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random positioning and animation delay
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                
+                // Random size variations (smaller on mobile)
+                const baseSize = isMobile ? 2 : 4;
+                const size = Math.random() * baseSize + (isMobile ? 1 : 2);
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                // Random opacity
+                particle.style.opacity = Math.random() * 0.6 + 0.2;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Mobile-friendly viewport height fix
+        function setViewportHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        // Initialize on load and resize
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            setViewportHeight();
+        });
+        
+        window.addEventListener('resize', setViewportHeight);
+        
+        // Optimize for mobile - reduce animations on low-end devices
+        if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+            document.documentElement.style.setProperty('--animation-duration', '0.2s');
+        }
+    </script>
 </body>
 </html>
