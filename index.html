@@ -22,8 +22,6 @@
         rel="stylesheet"
         href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"
     />
-
-    <link rel="stylesheet" href="public/styles.css" />
 </head>
 <body>
     <!-- Floating Particles -->
@@ -33,161 +31,167 @@
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Welcome to VISIONX</h2>
+                <h2>🌟 VISIONX</h2>
+                <p>Smart Navigation & Safety Platform</p>
             </div>
-            <div class="modal-body">
-                <div class="auth-tabs">
-                    <button id="loginTab" class="tab active">Login</button>
-                    <button id="registerTab" class="tab">Register</button>
+            
+            <!-- Auth Tabs -->
+            <div class="auth-tabs">
+                <button id="loginTab" class="tab active" onclick="showLoginTab()">Login</button>
+                <button id="registerTab" class="tab" onclick="showRegisterTab()">Register</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required />
                 </div>
-                
-                <!-- Login Form -->
-                <form id="loginForm" class="auth-form">
-                    <div class="form-group">
-                        <label for="loginEmail">Email</label>
-                        <input id="loginEmail" type="email" placeholder="Enter your email" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input id="loginPassword" type="password" placeholder="Enter your password" required minlength="3" />
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                    <div class="login-hint">
-                        <small>You can use any email and password (3+ characters) to login</small>
-                    </div>
-                </form>
-
-                <!-- Register Form -->
-                <form id="registerForm" class="auth-form" style="display: none;">
-                    <div class="form-group">
-                        <label for="registerName">Full Name</label>
-                        <input id="registerName" type="text" placeholder="Enter your full name" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="registerEmail">Email</label>
-                        <input id="registerEmail" type="email" placeholder="Enter your email" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPhone">Phone</label>
-                        <input id="registerPhone" type="tel" placeholder="Enter your phone number" />
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPassword">Password</label>
-                        <input id="registerPassword" type="password" placeholder="Create a password" required minlength="3" />
-                    </div>
-                    <button type="submit" class="btn btn-primary">Register</button>
-                    <div class="login-hint">
-                        <small>Create an account with any details</small>
-                    </div>
-                </form>
-            </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password (3+ characters)" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <div class="login-hint">
+                    <small>Use any email and password (3+ characters) to login</small>
+                </div>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form hidden">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" placeholder="Enter your full name" required />
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" placeholder="Enter your email" required />
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">Phone (Optional)</label>
+                    <input type="tel" id="registerPhone" placeholder="Enter your phone number" />
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" placeholder="Create a password (3+ characters)" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+                <div class="login-hint">
+                    <small>Create account with any details to get started</small>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Main App - Initially Hidden -->
-    <div id="app" style="display: none;">
+    <!-- Main App -->
+    <div id="app" class="hidden">
+        <!-- Top Bar -->
         <header class="topbar">
             <div class="brand">
-                <span class="logo">👁️</span>
-                <span class="title">VISIONX</span>
+                <div class="logo">🌟</div>
+                <h1 class="title">VISIONX</h1>
             </div>
-            <nav class="actions">
-                <button id="bleConnectBtn" class="btn">Connect Stick</button>
-                <button id="bleDisconnectBtn" class="btn btn-secondary">Disconnect</button>
-                <button id="startRouteBtn" class="btn">Start Route</button>
-                <button id="sosSmsBtn" class="btn btn-danger">SOS SMS</button>
-                <button id="sosWaBtn" class="btn btn-danger">SOS WhatsApp</button>
-                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
-            </nav>
+            <div class="actions">
+                <button class="btn btn-small btn-success" onclick="locateUser()">📍 Locate Me</button>
+                <button class="btn btn-small btn-info" onclick="connectBle()">🔗 Connect</button>
+                <button class="btn btn-small btn-warning" onclick="sendSosSms()">🚨 SOS SMS</button>
+                <button class="btn btn-small btn-danger" onclick="sendSosWhatsApp()">📱 SOS WhatsApp</button>
+                <button class="btn btn-small btn-secondary" onclick="handleLogout()">🚪 Logout</button>
+            </div>
         </header>
 
-        <main class="layout">
-            <section class="left">
+        <!-- Main Layout -->
+        <div class="layout">
+            <main class="left">
+                <!-- Map Panel -->
                 <div class="panel">
-                    <label for="searchInput">Destination</label>
-                    <div class="search-row">
-                        <input id="searchInput" type="text" placeholder="Search place or address" />
-                        <button id="searchBtn" class="btn btn-small">Search</button>
-                    </div>
-                    <div class="hint">Tip: Tap anywhere on the map to set destination.</div>
+                    <h3>🗺️ Interactive Map</h3>
+                    <div id="map" class="map"></div>
                 </div>
 
-                <div id="map" class="map"></div>
-            </section>
+                <!-- Search Panel -->
+                <div class="panel">
+                    <h3>🔍 Location Search</h3>
+                    <div class="search-row">
+                        <input type="text" id="searchInput" placeholder="Search for places..." />
+                        <button class="btn btn-primary" onclick="searchLocation()">Search</button>
+                    </div>
+                </div>
+            </main>
 
             <aside class="right">
+                <!-- User Profile -->
                 <div class="panel">
-                    <h3>User Profile</h3>
+                    <h3>👤 User Profile</h3>
                     <div id="userProfile" class="user-profile">
                         <div class="loading">Loading profile...</div>
                     </div>
                 </div>
 
+                <!-- Guardian Contacts -->
                 <div class="panel">
-                    <h3>Guardian Contacts</h3>
+                    <h3>👥 Guardian Contacts</h3>
                     <div id="guardianList" class="guardian-list">
-                        <div class="guardian-item">
-                            <strong>Emergency Contact 1</strong>
-                            <span>+1-234-567-8901 (Family)</span>
-                        </div>
-                        <div class="guardian-item">
-                            <strong>Emergency Contact 2</strong>
-                            <span>+1-234-567-8902 (Friend)</span>
-                        </div>
+                        <div class="loading">Loading guardians...</div>
                     </div>
                 </div>
 
+                <!-- Device Status -->
                 <div class="panel">
-                    <h3>Device Status</h3>
+                    <h3>📱 Device Status</h3>
                     <ul class="kv">
-                        <li><span>BLE</span><strong id="bleStatus">disconnected</strong></li>
-                        <li><span>GPS</span><strong id="gpsStatus">ready</strong></li>
-                        <li><span>Battery</span><strong id="batteryLevel">85%</strong></li>
-                        <li><span>Signal</span><strong id="signalStrength">Strong</strong></li>
+                        <li><span>🔗 BLE</span><strong id="bleStatus">disconnected</strong></li>
+                        <li><span>🛰️ GPS</span><strong id="gpsStatus">locating…</strong></li>
+                        <li><span>🔋 Battery</span><strong id="batteryLevel">—</strong></li>
+                        <li><span>📶 Signal</span><strong id="signalStrength">—</strong></li>
                     </ul>
                 </div>
 
+                <!-- Location Info -->
                 <div class="panel">
-                    <h3>Location</h3>
+                    <h3>📍 Location Info</h3>
                     <ul class="kv">
-                        <li><span>You</span><strong id="youCoords">Detecting...</strong></li>
-                        <li><span>Dest</span><strong id="destCoords">Not set</strong></li>
+                        <li><span>You</span><strong id="youCoords">—</strong></li>
+                        <li><span>Dest</span><strong id="destCoords">—</strong></li>
                         <li><span>Distance</span><strong id="distanceToDest">—</strong></li>
                         <li><span>ETA</span><strong id="etaToDest">—</strong></li>
                     </ul>
                 </div>
 
+                <!-- Navigation History -->
                 <div class="panel">
-                    <h3>Navigation History</h3>
+                    <h3>🧭 Navigation History</h3>
                     <div id="navigationHistory" class="history-list">
-                        <div class="loading">No navigation history</div>
+                        <div class="loading">Loading history...</div>
                     </div>
                 </div>
 
+                <!-- Obstacles History -->
                 <div class="panel">
-                    <h3>Obstacles History</h3>
+                    <h3>🚧 Obstacles History</h3>
                     <div id="obstaclesHistory" class="obstacles-list">
-                        <div class="loading">No obstacles detected</div>
+                        <div class="loading">Loading obstacles...</div>
                     </div>
                 </div>
 
+                <!-- Emergency Alerts -->
                 <div class="panel">
-                    <h3>Emergency Alerts</h3>
+                    <h3>🚨 Emergency Alerts</h3>
                     <div id="alertsList" class="alerts-list">
-                        <div class="loading">No active alerts</div>
+                        <div class="loading">Loading alerts...</div>
                     </div>
                 </div>
 
+                <!-- System Log -->
                 <div class="panel">
-                    <h3>System Logs</h3>
-                    <pre id="log" class="log">VISIONX System Ready!</pre>
+                    <h3>📝 System Log</h3>
+                    <div id="log" class="log">System initialized...</div>
                 </div>
             </aside>
-        </main>
+        </div>
     </div>
 
-    <!-- Socket.io (CDN for static hosting like GitHub Pages) -->
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-Iw7/ol6oXUo3oh6vBdnFHsGxFJYdGqubg5gKlGdq1RTD6R0cJcK0KThhFIlJt7c+" crossorigin="anonymous"></script>
+    <!-- Scripts -->
     <!-- Leaflet JS -->
     <script
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -195,25 +199,17 @@
         crossorigin=""
     ></script>
     <!-- Leaflet Routing Machine JS -->
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
-
-    <script>
-        // For GitHub Pages deployment, you'll need to deploy your backend separately
-        // You can use services like Heroku, Railway, Render, or Vercel for the backend
-        // Leave empty string for demo mode without backend
-        window.API_BASE="";
-    </script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    
+    <!-- Main App Script -->
     <script src="public/login-app.js"></script>
     
     <!-- Floating Particles Script -->
     <script>
-        // Create floating particles with mobile optimization
+        // Create floating particles
         function createParticles() {
             const particlesContainer = document.querySelector('.particles');
-            
-            // Reduce particles on mobile for better performance
-            const isMobile = window.innerWidth <= 768;
-            const particleCount = isMobile ? 20 : 50;
+            const particleCount = 50;
             
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
@@ -224,9 +220,8 @@
                 particle.style.animationDelay = Math.random() * 15 + 's';
                 particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
                 
-                // Random size variations (smaller on mobile)
-                const baseSize = isMobile ? 2 : 4;
-                const size = Math.random() * baseSize + (isMobile ? 1 : 2);
+                // Random size variations
+                const size = Math.random() * 4 + 2;
                 particle.style.width = size + 'px';
                 particle.style.height = size + 'px';
                 
@@ -237,24 +232,8 @@
             }
         }
         
-        // Mobile-friendly viewport height fix
-        function setViewportHeight() {
-            const vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
-        }
-        
-        // Initialize on load and resize
-        document.addEventListener('DOMContentLoaded', () => {
-            createParticles();
-            setViewportHeight();
-        });
-        
-        window.addEventListener('resize', setViewportHeight);
-        
-        // Optimize for mobile - reduce animations on low-end devices
-        if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
-            document.documentElement.style.setProperty('--animation-duration', '0.2s');
-        }
+        // Initialize particles when page loads
+        document.addEventListener('DOMContentLoaded', createParticles);
     </script>
 </body>
 </html>
