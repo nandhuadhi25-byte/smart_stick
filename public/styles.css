@@ -569,3 +569,67 @@ input[type="text"] {
     gap: 4px;
   }
 }
+
+/* Make sure main app is always visible */
+#app {
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Hide login modal completely */
+#loginModal {
+    display: none !important;
+}
+
+/* Guardian item styling */
+.guardian-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.guardian-item:last-child {
+    border-bottom: none;
+}
+
+.guardian-item strong {
+    display: block;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.guardian-item span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* User info styling */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.user-details h4 {
+    margin: 0 0 5px 0;
+    color: var(--text);
+    font-size: 16px;
+}
+
+.user-details p {
+    margin: 2px 0;
+    color: var(--muted);
+    font-size: 14px;
+}

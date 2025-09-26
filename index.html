@@ -23,58 +23,8 @@
     <link rel="stylesheet" href="./public/styles.css" />
 </head>
 <body>
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Welcome to VISIONX</h2>
-                <button id="closeLoginModal" class="close-btn">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="auth-tabs">
-                    <button id="loginTab" class="tab-btn active">Login</button>
-                    <button id="registerTab" class="tab-btn">Register</button>
-                </div>
-                
-                <!-- Login Form -->
-                <form id="loginForm" class="auth-form">
-                    <div class="form-group">
-                        <label for="loginEmail">Email</label>
-                        <input id="loginEmail" type="email" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input id="loginPassword" type="password" required />
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
-
-                <!-- Register Form -->
-                <form id="registerForm" class="auth-form hidden">
-                    <div class="form-group">
-                        <label for="registerName">Full Name</label>
-                        <input id="registerName" type="text" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="registerEmail">Email</label>
-                        <input id="registerEmail" type="email" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPhone">Phone</label>
-                        <input id="registerPhone" type="tel" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPassword">Password</label>
-                        <input id="registerPassword" type="password" required />
-                    </div>
-                    <button type="submit" class="btn btn-primary">Register</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main App -->
-    <div id="app" class="hidden">
+    <!-- Main App - No Login Required -->
+    <div id="app">
         <header class="topbar">
             <div class="brand">
                 <span class="logo">👁️</span>
@@ -86,7 +36,6 @@
                 <button id="startRouteBtn" class="btn">Start Route</button>
                 <button id="sosSmsBtn" class="btn btn-danger">SOS SMS</button>
                 <button id="sosWaBtn" class="btn btn-danger">SOS WhatsApp</button>
-                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
             </nav>
         </header>
 
@@ -108,14 +57,28 @@
                 <div class="panel">
                     <h3>User Profile</h3>
                     <div id="userProfile" class="user-profile">
-                        <div class="loading">Loading profile...</div>
+                        <div class="user-info">
+                            <div class="user-avatar">U</div>
+                            <div class="user-details">
+                                <h4>VISIONX User</h4>
+                                <p>user@visionx.com</p>
+                                <p>+1-234-567-8900</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="panel">
                     <h3>Guardian Contacts</h3>
                     <div id="guardianList" class="guardian-list">
-                        <div class="loading">Loading guardians...</div>
+                        <div class="guardian-item">
+                            <strong>Emergency Contact 1</strong>
+                            <span>+1-234-567-8901 (Family)</span>
+                        </div>
+                        <div class="guardian-item">
+                            <strong>Emergency Contact 2</strong>
+                            <span>+1-234-567-8902 (Friend)</span>
+                        </div>
                     </div>
                 </div>
 
@@ -123,17 +86,17 @@
                     <h3>Device Status</h3>
                     <ul class="kv">
                         <li><span>BLE</span><strong id="bleStatus">disconnected</strong></li>
-                        <li><span>GPS</span><strong id="gpsStatus">locating…</strong></li>
-                        <li><span>Battery</span><strong id="batteryLevel">—</strong></li>
-                        <li><span>Signal</span><strong id="signalStrength">—</strong></li>
+                        <li><span>GPS</span><strong id="gpsStatus">ready</strong></li>
+                        <li><span>Battery</span><strong id="batteryLevel">85%</strong></li>
+                        <li><span>Signal</span><strong id="signalStrength">Strong</strong></li>
                     </ul>
                 </div>
 
                 <div class="panel">
                     <h3>Location</h3>
                     <ul class="kv">
-                        <li><span>You</span><strong id="youCoords">—</strong></li>
-                        <li><span>Dest</span><strong id="destCoords">—</strong></li>
+                        <li><span>You</span><strong id="youCoords">Detecting...</strong></li>
+                        <li><span>Dest</span><strong id="destCoords">Not set</strong></li>
                         <li><span>Distance</span><strong id="distanceToDest">—</strong></li>
                         <li><span>ETA</span><strong id="etaToDest">—</strong></li>
                     </ul>
@@ -162,7 +125,7 @@
 
                 <div class="panel">
                     <h3>System Logs</h3>
-                    <pre id="log" class="log"></pre>
+                    <pre id="log" class="log">VISIONX System Ready!</pre>
                 </div>
             </aside>
         </main>
@@ -185,6 +148,6 @@
         // Leave empty string for demo mode without backend
         window.API_BASE="";
     </script>
-    <script src="./public/app.js"></script>
+    <script src="./public/direct-app.js"></script>
 </body>
 </html>
