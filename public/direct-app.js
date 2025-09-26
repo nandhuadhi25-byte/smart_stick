@@ -5,11 +5,11 @@ let destLatLng = null;
 
 // Initialize app immediately
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 VISIONX Starting...');
+  console.log('🚀 VISIONX v2 Starting...');
   initializeMap();
   setupEventListeners();
   loadDemoData();
-  log('VISIONX System Ready!');
+  log('VISIONX System Ready v2!');
 });
 
 function setupEventListeners() {
